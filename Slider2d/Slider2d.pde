@@ -23,6 +23,10 @@ int gridY = 5;
 
 Trackpad   trackPadViz;
 
+// unlock point sequence
+int[] xPoints = new int[4];
+int[] yPoints = new int[4];
+
 void setup()
 {
   context = new SimpleOpenNI(this,SimpleOpenNI.RUN_MODE_MULTI_THREADED);
@@ -62,6 +66,9 @@ void setup()
   println("1. Wave till the tiles get green");  
   println("2. The relative hand movement will select the tiles");  
   println("-------------------------------");   
+
+  String fileName = "data/data.txt";
+  readFile(fileName);
 }
 
 void draw()
@@ -138,9 +145,32 @@ void onPrimaryPointCreate(XnVHandPointContext pContext,XnPoint3D ptFocus)
 
 void onPrimaryPointDestroy(int nID)
 {
-  println("onPrimaryPointDestroy");
+  // println("onPrimaryPointDestroy");
   
   trackPadViz.disable();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// save and read data from file
+void readFile(String fileName)
+{
+  String[] lines = loadStrings(fileName);
+  
+  if (lines.length != 4)
+  {
+    println("Must have exactly 4 points");  
+  }
+  else
+  {
+    for (int i = 0; i < lines.length; i++)
+    {
+      xPoints[i] = int(split(lines[i], ' ')[0]);
+      yPoints[i] = int(split(lines[i], ' ')[1]);    
+    }
+
+    println(xPoints);
+    println(yPoints);  
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,6 +195,7 @@ class Trackpad
   int      selY;
   int      dir;
   
+  int      unlockCount = 0;
   
   Trackpad(PVector center,int xRes,int yRes,int width,int height,int space)
   {
@@ -205,6 +236,25 @@ class Trackpad
     selX = indexX;
     selY =  (yRes-1) - indexY;
     this.dir = dir;
+    
+    if (unlockCount < 3) {
+      println("unlock count: " + unlockCount);
+      println("1: " + selX + " " + selY);
+      println("2: " + xPoints[unlockCount] + " " + yPoints[unlockCount]);  
+    }
+    
+    if (unlockCount >= 3) 
+    {
+      println("System unlocked");
+    }
+    else if (selX == xPoints[unlockCount] && selY == yPoints[unlockCount])
+    { 
+      unlockCount++;
+    }
+    else
+    {
+      println("Failed to unlock");
+    }
   }
   
   void disable()
@@ -224,13 +274,15 @@ class Trackpad
         for(int x=0;x < xRes;x++)
         {
           if(active && (selX == x) && (selY == y))
-          { // selected object 
+          {
+            // selected object 
             fill(100,100,220,190);
             strokeWeight(3);
             stroke(100,200,100,220);
           }
           else if(active && (focusX == x) && (focusY == y))
-          { // focus object 
+          { 
+            // focus object 
             fill(100,255,100,220);
             strokeWeight(3);
             stroke(100,200,100,220);
