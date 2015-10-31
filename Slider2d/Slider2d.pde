@@ -27,8 +27,7 @@ Trackpad   trackPadViz;
 int[] xPoints = new int[4];
 int[] yPoints = new int[4];
 
-void setup()
-{
+void setup() {
   context = new SimpleOpenNI(this,SimpleOpenNI.RUN_MODE_MULTI_THREADED);
    
   // mirror is by default enabled
@@ -71,8 +70,7 @@ void setup()
   readFile(fileName);
 }
 
-void draw()
-{
+void draw() {
   // update the cam
   context.update();
   
@@ -85,10 +83,8 @@ void draw()
   trackPadViz.draw();
 }
 
-void keyPressed()
-{
-  switch(key)
-  {
+void keyPressed() {
+  switch(key) {
   case 'e':
     // end sessions
     sessionManager.EndSession();
@@ -100,51 +96,43 @@ void keyPressed()
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // session callbacks
 
-void onStartSession(PVector pos)
-{
+void onStartSession(PVector pos) {
   println("onStartSession: " + pos);
 }
 
-void onEndSession()
-{
+void onEndSession() {
   println("onEndSession: ");
 }
 
-void onFocusSession(String strFocus,PVector pos,float progress)
-{
+void onFocusSession(String strFocus,PVector pos,float progress) {
   println("onFocusSession: focus=" + strFocus + ",pos=" + pos + ",progress=" + progress);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // XnVSelectableSlider2D callbacks
 
-void onItemHover(int nXIndex,int nYIndex)
-{
+void onItemHover(int nXIndex,int nYIndex) {
   println("onItemHover: nXIndex=" + nXIndex +" nYIndex=" + nYIndex);
   
   trackPadViz.update(nXIndex, nYIndex);
 }
 
-void onValueChange(float fXValue,float fYValue)
-{
+void onValueChange(float fXValue,float fYValue) {
  // println("onValueChange: fXValue=" + fXValue +" fYValue=" + fYValue);
 }
 
-void onItemSelect(int nXIndex, int nYIndex, int eDir)
-{
+void onItemSelect(int nXIndex, int nYIndex, int eDir) {
   println("onItemSelect: nXIndex=" + nXIndex + " nYIndex=" + nYIndex + " eDir=" + eDir);
   trackPadViz.push(nXIndex, nYIndex, eDir);
 }
 
-void onPrimaryPointCreate(XnVHandPointContext pContext,XnPoint3D ptFocus)
-{
+void onPrimaryPointCreate(XnVHandPointContext pContext,XnPoint3D ptFocus) {
   println("onPrimaryPointCreate");
   
   trackPadViz.enable();
 }
 
-void onPrimaryPointDestroy(int nID)
-{
+void onPrimaryPointDestroy(int nID) {
   // println("onPrimaryPointDestroy");
   
   trackPadViz.disable();
@@ -152,18 +140,14 @@ void onPrimaryPointDestroy(int nID)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // save and read data from file
-void readFile(String fileName)
-{
+void readFile(String fileName) {
   String[] lines = loadStrings(fileName);
   
-  if (lines.length != 4)
-  {
+  if (lines.length != 4) {
     println("Must have exactly 4 points");  
   }
-  else
-  {
-    for (int i = 0; i < lines.length; i++)
-    {
+  else {
+    for (int i = 0; i < lines.length; i++) {
       xPoints[i] = int(split(lines[i], ' ')[0]);
       yPoints[i] = int(split(lines[i], ' ')[1]);    
     }
@@ -176,8 +160,7 @@ void readFile(String fileName)
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Trackpad
 
-class Trackpad
-{
+class Trackpad {
   int     xRes;
   int     yRes;
   int     width;
@@ -197,8 +180,7 @@ class Trackpad
   
   int      unlockCount = 0;
   
-  Trackpad(PVector center,int xRes,int yRes,int width,int height,int space)
-  {
+  Trackpad(PVector center,int xRes,int yRes,int width,int height,int space) {
     this.xRes     = xRes;
     this.yRes     = yRes;
     this.width    = width;
@@ -215,8 +197,7 @@ class Trackpad
     this.space = space;
   }
   
-  void enable()
-  {
+  void enable() {
     active = true;
     
     focusX = -1;
@@ -227,14 +208,12 @@ class Trackpad
     unlockCount = 0;
   }
   
-  void update(int indexX,int indexY)
-  {
+  void update(int indexX,int indexY) {
     focusX = indexX;
     focusY = (yRes-1) - indexY;
   }
   
-  void push(int indexX, int indexY, int dir)
-  {
+  void push(int indexX, int indexY, int dir) {
     selX = indexX;
     selY =  (yRes-1) - indexY;
     this.dir = dir;
@@ -263,8 +242,7 @@ class Trackpad
     }    
   }
   
-  void disable()
-  {
+  void disable() {
     active = false;
   }
 
@@ -296,17 +274,14 @@ class Trackpad
     }
   }
   
-  void draw()
-  {    
+  void draw() {    
     pushStyle();
     pushMatrix();
     
     translate(offset.x,offset.y);
   
-    for(int y=0; y < yRes; y++)
-    {
-      for(int x=0; x < xRes; x++)
-      {
+    for(int y=0; y < yRes; y++) {
+      for(int x=0; x < xRes; x++) {
         if (unlockCount >= 4) {
           drawRestart();
 
@@ -324,29 +299,25 @@ class Trackpad
           stroke(100, 200, 100, 220);
         }
         else {
-          if(active && (selX == x) && (selY == y))
-          {
+          if(active && (selX == x) && (selY == y)) {
             // selected object 
             fill(100,100,220,190);
             strokeWeight(3);
             stroke(100,200,100,220);
           }
-          else if(active && (focusX == x) && (focusY == y))
-          { 
+          else if(active && (focusX == x) && (focusY == y)) { 
             // focus object 
             fill(100,255,100,220);
             strokeWeight(3);
             stroke(100,200,100,220);
           }
-          else if(active)
-          {  
+          else if(active) {  
             // normal
             strokeWeight(3);
             stroke(100,200,100,190);
             noFill();
           }
-          else
-          {
+          else {
             strokeWeight(2);
             stroke(200,100,100,60);
             noFill();
