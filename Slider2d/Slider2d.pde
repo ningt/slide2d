@@ -226,7 +226,7 @@ class Trackpad {
     
     // push restart button
     if (selY == 5) {
-      // do nothing
+      enable();
     }
     else {
       if (unlockCount >= 4) {
@@ -254,8 +254,6 @@ class Trackpad {
       stroke(100,200,100,220);
 
       rect(2 * (width + space), 5 * (width + space), width * 3 + 2 * space, height);
-
-      enable();
     }
     else if(active && focusY == 5) { 
       // focus object 
