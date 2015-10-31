@@ -253,7 +253,7 @@ class Trackpad {
       strokeWeight(3);
       stroke(100,200,100,220);
 
-      rect(2 * (width + space), 5 * (width + space), width * 3 + space + 2, height);
+      rect(2 * (width + space), 5 * (width + space), width * 3 + 2 * space, height);
 
       enable();
     }
@@ -263,14 +263,19 @@ class Trackpad {
       strokeWeight(3);
       stroke(100,200,100,220);
 
-      rect(2 * (width + space), 5 * (width + space), width * 3 + space + 2, height);
+      rect(2 * (width + space), 5 * (width + space), width * 3 + 2 * space, height);
     }
     else {
+      PFont f = createFont("Arial", 16, true);
+      textFont(f, 24);             
+      fill(255);
+      text("RESTART", 2 * width + 4 * space, 5 * width + 7 * space);
+
       // normal
       strokeWeight(3);
       stroke(100,200,100,190);
       noFill();
-      rect(2 * (width + space), 5 * (width + space), width * 3 + space + 2, height);  
+      rect(2 * (width + space), 5 * (width + space), width * 3 + 2 * space, height);  
     }
   }
   
