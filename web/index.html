@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>CS3235</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+    body {
+        padding-top: 70px;
+        /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+    }
+    </style>
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">CS3235</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <!--
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#">About</a>
+                    </li>
+                </ul>
+            -->
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>CS3235</h1>
+                <p class="lead">Enter your password and generate your secret security card!</p>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="input-group">
+      <input type="text" class="form-control" id="password" placeholder="Enter your password...">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" onclick="generate()">Generate</button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+<br/>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <table class="table table-bordered" id="security_card">
+      <tbody>
+      </tbody>
+    </table>
+  </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+            </div>
+        </div>
+        <!-- /.row -->
+
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery Version 1.11.1 -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+
+    <script>
+    var X = 5;
+    var Y = 7;
+    function generate(){
+        $("#security_card > tbody:last").children().remove();
+        var header = "";
+        for(var i = 0; i < Y; i++){
+            header += ('<td class="info" >'+(i+1)+'</td>');
+        }
+
+        $("#security_card").find('tbody').append('<tr><td>#</td>'+header+'</tr>');
+        var hash = hashCode($("#password").val());
+        var rng = CustomRandom(hash);
+        for(var i = 0; i < X; i++){
+            var row = "";
+            for(var j = 0; j < Y; j++){
+                row += ('<td>'+rng.next()%(X*Y)+'</td>');
+            }
+            $('#security_card tr:last').after('<tr><td class="info">'+(i+1)+'</td>'+row+'</tr>');
+        }
+
+        var myFirebaseRef = new Firebase("https://cs3235.firebaseio.com/");
+        myFirebaseRef.set({
+          code: "123",
+        });
+    }
+
+var CustomRandom = function(nseed) {
+    var seed,
+        constant = Math.pow(2, 13)+1,
+        prime = 37,
+        maximum = Math.pow(2, 50);
+    if (nseed) {
+        seed = nseed;
+    }
+    if (seed == null) {
+//if there is no seed, use timestamp
+        seed = (new Date()).getTime();
+    } 
+    return {
+        next : function() {
+            seed *= constant;
+            seed += prime;
+            seed %= maximum;
+            return Math.abs(seed);
+        }
+    }
+}
+hashCode = function(str){
+    var hash = 0;
+    for (i = 0; i < str.length; i++) {
+        char = str.charCodeAt(i);
+        hash = char + (hash << 6) + (hash << 16) - hash;
+    }
+    return hash;
+}
+    </script>
+</body>
+</html>

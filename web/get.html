@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title></title>
+</head>
+<body>
+
+</body>
+
+<script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+<script>
+	var myFirebaseRef = new Firebase("https://cs3235.firebaseio.com/");
+	myFirebaseRef.child("code").on("value", function(snapshot) {
+  console.log(snapshot['A']['B']);
+});
+</script>
+</html>
