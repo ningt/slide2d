@@ -24,11 +24,7 @@ int gridY = 6;
 
 Trackpad   trackPadViz;
 
-// unlock point sequence
-int[] xPoints = new int[4];
-int[] yPoints = new int[4];
-
-Point[][] tokenPad = new Point[gridX][gridY-1];
+int[][] tokenPad = new int[gridX][gridY-1];
 
 Point highlight = randomPoint();
 
@@ -144,23 +140,7 @@ void onPrimaryPointDestroy(int nID) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-// save and read data from file
-void readFile(String fileName) {
-  String[] lines = loadStrings(fileName);
-  
-  if (lines.length != 4) {
-    println("Must have exactly 4 points");  
-  }
-  else {
-    for (int i = 0; i < lines.length; i++) {
-      xPoints[i] = int(split(lines[i], ' ')[0]);
-      yPoints[i] = int(split(lines[i], ' ')[1]);
-    }
-
-    println(xPoints);
-    println(yPoints);  
-  }
-}
+// Load tokenPad
 
 void readTokenPad(String fileName) {
   String[] lines = loadStrings(fileName);
@@ -170,23 +150,22 @@ void readTokenPad(String fileName) {
   } 
   else {
     for (int i = 0; i < lines.length; i++) {
-      String[] points = split(lines[i], ' ');
+      String[] nums = split(lines[i], ' ');
 
-      if (points.length != gridX) {
+      if (nums.length != gridX) {
         println("Invalid tokenPad");
         return;
       }
 
-      for (int j = 0; j < points.length; j++) {
-        int x = int(split(points[j], ',')[0]);
-        int y = int(split(points[j], ',')[1]);
-
-        tokenPad[j][i] = new Point(x, y);
+      for (int j = 0; j < nums.length; j++) {
+        tokenPad[j][i] = int(nums[j]);
       }
     }
   } 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate a random point
 Point randomPoint() {
   Random r = new Random();
   
@@ -261,7 +240,7 @@ class Trackpad {
     if (unlockCount >= 0 && unlockCount < 3) {
       println("unlock count: " + unlockCount);
       println("1: " + selX + " " + selY);
-      println("2: " + xPoints[unlockCount] + " " + yPoints[unlockCount]);  
+      // println("2: " + xPoints[unlockCount] + " " + yPoints[unlockCount]);  
     }
 
     // push restart button
@@ -269,12 +248,12 @@ class Trackpad {
       enable();
     }
     else {
-      Point point = tokenPad[highlight.x][highlight.y];
+      int point = tokenPad[highlight.x][highlight.y];
 
       if (unlockCount >= 2) {
         println("System unlocked");  
       }
-      else if (unlockCount != -1 && (selX == point.x && selY == point.y)) { 
+      else if (unlockCount != -1 && (selY * 7 + selX == point)) { 
         unlockCount++;
 
         highlight = randomPoint();
