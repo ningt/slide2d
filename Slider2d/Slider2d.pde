@@ -237,22 +237,23 @@ class Trackpad
     selY =  (yRes-1) - indexY;
     this.dir = dir;
     
-    if (unlockCount < 3) {
+    if (unlockCount >= 0 && unlockCount < 3) {
       println("unlock count: " + unlockCount);
       println("1: " + selX + " " + selY);
       println("2: " + xPoints[unlockCount] + " " + yPoints[unlockCount]);  
     }
     
-    if (unlockCount >= 3) 
+    if (unlockCount >= 4) 
     {
-      println("System unlocked");
+      println("System unlocked");  
     }
-    else if (selX == xPoints[unlockCount] && selY == yPoints[unlockCount])
+    else if (unlockCount != -1 && (selX == xPoints[unlockCount] && selY == yPoints[unlockCount]))
     { 
       unlockCount++;
     }
     else
     {
+      unlockCount = -1;
       println("Failed to unlock");
     }
   }
@@ -267,12 +268,25 @@ class Trackpad
     pushStyle();
     pushMatrix();
     
-      translate(offset.x,offset.y);
-    
-      for(int y=0;y < yRes;y++)
+    translate(offset.x,offset.y);
+  
+    for(int y=0;y < yRes;y++)
+    {
+      for(int x=0;x < xRes;x++)
       {
-        for(int x=0;x < xRes;x++)
-        {
+        if (unlockCount >= 4) {
+          // success
+          fill(100,255,100,220);
+          strokeWeight(3);
+          stroke(100,200,100,220);  
+        }
+        else if (unlockCount <= -1) {
+          // fail
+          fill(255, 100, 100, 220);
+          strokeWeight(3);
+          stroke(100, 200, 100, 220);
+        }
+        else {
           if(active && (selX == x) && (selY == y))
           {
             // selected object 
@@ -298,10 +312,13 @@ class Trackpad
             strokeWeight(2);
             stroke(200,100,100,60);
             noFill();
-          }
-           rect(x * (width + space),y * (width + space),width,height);  
+          }  
         }
+        
+       rect(x * (width + space),y * (width + space),width,height);  
       }
+    }
+
     popMatrix();
     popStyle();  
   }
