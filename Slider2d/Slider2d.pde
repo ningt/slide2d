@@ -60,7 +60,7 @@ void setup() {
 
   // create gui viz
   trackPadViz = new Trackpad(new PVector(context.depthWidth()/2, context.depthHeight()/2,0),
-                                         gridX,gridY,50,50,15);  
+                                         gridX, gridY-1, 50, 50, 15);  
 
   size(context.depthWidth(), context.depthHeight()); 
   smooth();
@@ -245,6 +245,7 @@ class Trackpad {
     selY = -1;
 
     unlockCount = 0;
+    yRes = gridY - 1;
   }
   
   void update(int indexX,int indexY) {
@@ -280,6 +281,7 @@ class Trackpad {
       }
       else {
         unlockCount = -1;
+        yRes = gridY;
         println("Failed to unlock");
       }
     }    
