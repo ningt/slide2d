@@ -11,6 +11,7 @@
  * ----------------------------------------------------------------------------
  */
 import SimpleOpenNI.*;
+import java.util.Random;
 
 SimpleOpenNI          context;
 
@@ -26,6 +27,10 @@ Trackpad   trackPadViz;
 // unlock point sequence
 int[] xPoints = new int[4];
 int[] yPoints = new int[4];
+
+Point[][] tokenPad = new Point[gridX][gridY-1];
+
+Point highlight = randomPoint();
 
 void setup() {
   context = new SimpleOpenNI(this,SimpleOpenNI.RUN_MODE_MULTI_THREADED);
@@ -67,7 +72,7 @@ void setup() {
   println("-------------------------------");   
 
   String fileName = "data/data.txt";
-  readFile(fileName);
+  readTokenPad(fileName);
 }
 
 void draw() {
@@ -149,12 +154,46 @@ void readFile(String fileName) {
   else {
     for (int i = 0; i < lines.length; i++) {
       xPoints[i] = int(split(lines[i], ' ')[0]);
-      yPoints[i] = int(split(lines[i], ' ')[1]);    
+      yPoints[i] = int(split(lines[i], ' ')[1]);
     }
 
     println(xPoints);
     println(yPoints);  
   }
+}
+
+void readTokenPad(String fileName) {
+  String[] lines = loadStrings(fileName);
+
+  if (lines.length != gridY-1) {
+    println("Invalid tokenPad");
+  } 
+  else {
+    for (int i = 0; i < lines.length; i++) {
+      String[] points = split(lines[i], ' ');
+
+      if (points.length != gridX) {
+        println("Invalid tokenPad");
+        return;
+      }
+
+      for (int j = 0; j < points.length; j++) {
+        int x = int(split(points[j], ',')[0]);
+        int y = int(split(points[j], ',')[1]);
+
+        tokenPad[j][i] = new Point(x, y);
+      }
+    }
+  } 
+}
+
+Point randomPoint() {
+  Random r = new Random();
+  
+  int x = r.nextInt(100) % gridX;
+  int y = r.nextInt(100) % (gridY-1);
+
+  return new Point(x, y);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,17 +262,21 @@ class Trackpad {
       println("1: " + selX + " " + selY);
       println("2: " + xPoints[unlockCount] + " " + yPoints[unlockCount]);  
     }
-    
+
     // push restart button
     if (selY == 5) {
       enable();
     }
     else {
-      if (unlockCount >= 4) {
+      Point point = tokenPad[highlight.x][highlight.y];
+
+      if (unlockCount >= 2) {
         println("System unlocked");  
       }
-      else if (unlockCount != -1 && (selX == xPoints[unlockCount] && selY == yPoints[unlockCount])) { 
+      else if (unlockCount != -1 && (selX == point.x && selY == point.y)) { 
         unlockCount++;
+
+        highlight = randomPoint();
       }
       else {
         unlockCount = -1;
@@ -282,10 +325,10 @@ class Trackpad {
     pushMatrix();
     
     translate(offset.x,offset.y);
-  
+
     for(int y=0; y < yRes; y++) {
       for(int x=0; x < xRes; x++) {
-        if (unlockCount >= 4) {
+        if (unlockCount >= 2) {
           drawRestart();
 
           // success
@@ -308,7 +351,7 @@ class Trackpad {
             strokeWeight(3);
             stroke(100,200,100,220);
           }
-          else if(active && (focusX == x) && (focusY == y)) { 
+          else if(active && ((highlight.x == x && highlight.y == y) || (focusX == x && focusY == y))) { 
             // focus object 
             fill(100,255,100,220);
             strokeWeight(3);
@@ -334,5 +377,15 @@ class Trackpad {
 
     popMatrix();
     popStyle();  
+  }
+}
+
+class Point {
+  int x;
+  int y;
+
+  Point(int x, int y) {
+    this.x = x;
+    this.y = y;
   }
 }
