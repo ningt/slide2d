@@ -359,6 +359,13 @@ class Trackpad {
           }
           else if(active) {  
             // normal
+            if (y < gridY-1) {
+              PFont f = createFont("Arial", 16, true);
+              textFont(f, 24);             
+              fill(255);
+              text(y * 7 + x, x * (width + space) + space, y * (width + space) + 2 * space);
+            }
+
             strokeWeight(3);
             stroke(100,200,100,190);
             noFill();
@@ -370,8 +377,9 @@ class Trackpad {
           }  
         }
         
-        if (y < 5)
+        if (y < 5) {
           rect(x * (width + space), y * (width + space), width, height);  
+        }
       }
     }
 
