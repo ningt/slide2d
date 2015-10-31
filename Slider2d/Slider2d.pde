@@ -19,7 +19,7 @@ XnVSessionManager     sessionManager;
 XnVSelectableSlider2D trackPad;
 
 int gridX = 7;
-int gridY = 5;
+int gridY = 6;
 
 Trackpad   trackPadViz;
 
@@ -122,7 +122,7 @@ void onItemHover(int nXIndex,int nYIndex)
 {
   println("onItemHover: nXIndex=" + nXIndex +" nYIndex=" + nYIndex);
   
-  trackPadViz.update(nXIndex,nYIndex);
+  trackPadViz.update(nXIndex, nYIndex);
 }
 
 void onValueChange(float fXValue,float fYValue)
@@ -130,10 +130,10 @@ void onValueChange(float fXValue,float fYValue)
  // println("onValueChange: fXValue=" + fXValue +" fYValue=" + fYValue);
 }
 
-void onItemSelect(int nXIndex,int nYIndex,int eDir)
+void onItemSelect(int nXIndex, int nYIndex, int eDir)
 {
   println("onItemSelect: nXIndex=" + nXIndex + " nYIndex=" + nYIndex + " eDir=" + eDir);
-  trackPadViz.push(nXIndex,nYIndex,eDir);
+  trackPadViz.push(nXIndex, nYIndex, eDir);
 }
 
 void onPrimaryPointCreate(XnVHandPointContext pContext,XnPoint3D ptFocus)
@@ -223,6 +223,8 @@ class Trackpad
     focusY = -1;
     selX = -1;
     selY = -1;
+
+    unlockCount = 0;
   }
   
   void update(int indexX,int indexY)
@@ -231,7 +233,7 @@ class Trackpad
     focusY = (yRes-1) - indexY;
   }
   
-  void push(int indexX,int indexY,int dir)
+  void push(int indexX, int indexY, int dir)
   {
     selX = indexX;
     selY =  (yRes-1) - indexY;
@@ -243,24 +245,55 @@ class Trackpad
       println("2: " + xPoints[unlockCount] + " " + yPoints[unlockCount]);  
     }
     
-    if (unlockCount >= 4) 
-    {
-      println("System unlocked");  
+    // push restart button
+    if (selY == 5) {
+      // do nothing
     }
-    else if (unlockCount != -1 && (selX == xPoints[unlockCount] && selY == yPoints[unlockCount]))
-    { 
-      unlockCount++;
-    }
-    else
-    {
-      unlockCount = -1;
-      println("Failed to unlock");
-    }
+    else {
+      if (unlockCount >= 4) {
+        println("System unlocked");  
+      }
+      else if (unlockCount != -1 && (selX == xPoints[unlockCount] && selY == yPoints[unlockCount])) { 
+        unlockCount++;
+      }
+      else {
+        unlockCount = -1;
+        println("Failed to unlock");
+      }
+    }    
   }
   
   void disable()
   {
     active = false;
+  }
+
+  void drawRestart() {
+    if(active && selY == 5) {
+      // selected object 
+      fill(100,100,220,190);
+      strokeWeight(3);
+      stroke(100,200,100,220);
+
+      rect(2 * (width + space), 5 * (width + space), width * 3 + space + 2, height);
+
+      enable();
+    }
+    else if(active && focusY == 5) { 
+      // focus object 
+      fill(100,255,100,220);
+      strokeWeight(3);
+      stroke(100,200,100,220);
+
+      rect(2 * (width + space), 5 * (width + space), width * 3 + space + 2, height);
+    }
+    else {
+      // normal
+      strokeWeight(3);
+      stroke(100,200,100,190);
+      noFill();
+      rect(2 * (width + space), 5 * (width + space), width * 3 + space + 2, height);  
+    }
   }
   
   void draw()
@@ -270,17 +303,21 @@ class Trackpad
     
     translate(offset.x,offset.y);
   
-    for(int y=0;y < yRes;y++)
+    for(int y=0; y < yRes; y++)
     {
-      for(int x=0;x < xRes;x++)
+      for(int x=0; x < xRes; x++)
       {
         if (unlockCount >= 4) {
+          drawRestart();
+
           // success
           fill(100,255,100,220);
           strokeWeight(3);
-          stroke(100,200,100,220);  
+          stroke(100,200,100,220);
         }
         else if (unlockCount <= -1) {
+          drawRestart();
+
           // fail
           fill(255, 100, 100, 220);
           strokeWeight(3);
@@ -302,7 +339,8 @@ class Trackpad
             stroke(100,200,100,220);
           }
           else if(active)
-          {  // normal
+          {  
+            // normal
             strokeWeight(3);
             stroke(100,200,100,190);
             noFill();
@@ -315,7 +353,8 @@ class Trackpad
           }  
         }
         
-       rect(x * (width + space),y * (width + space),width,height);  
+        if (y < 5)
+          rect(x * (width + space), y * (width + space), width, height);  
       }
     }
 
