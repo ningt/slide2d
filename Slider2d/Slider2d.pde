@@ -144,23 +144,7 @@ void onPrimaryPointDestroy(int nID) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-// save and read data from file
-void readFile(String fileName) {
-  String[] lines = loadStrings(fileName);
-  
-  if (lines.length != 4) {
-    println("Must have exactly 4 points");  
-  }
-  else {
-    for (int i = 0; i < lines.length; i++) {
-      xPoints[i] = int(split(lines[i], ' ')[0]);
-      yPoints[i] = int(split(lines[i], ' ')[1]);
-    }
-
-    println(xPoints);
-    println(yPoints);  
-  }
-}
+// Load tokenPad
 
 void readTokenPad(String fileName) {
   String[] lines = loadStrings(fileName);
@@ -187,6 +171,8 @@ void readTokenPad(String fileName) {
   } 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate a random point
 Point randomPoint() {
   Random r = new Random();
   
