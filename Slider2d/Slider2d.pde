@@ -182,7 +182,9 @@ class Trackpad {
     int      selY;
     int      dir;
 
-    int      unlockCount = 0;
+    int      attemptCount = 0;   // number of attempts in the authentication process
+    int      successCount = 0;   // number of success in the authentication process
+    int      unlockCount = 3;    // total number of success needed to unlock the system
   
     Trackpad(PVector center,int xRes,int yRes,int width,int height,int space) {
         this.xRes     = xRes;
@@ -209,7 +211,8 @@ class Trackpad {
         selX = -1;
         selY = -1;
 
-        unlockCount = 0;
+        attemptCount = 0;
+        successCount = 0;
         yRes = gridY - 1;
     }
   
@@ -223,10 +226,8 @@ class Trackpad {
         selY =  (yRes-1) - indexY;
         this.dir = dir;
     
-        if (unlockCount >= 0 && unlockCount < 3) {
-            println("unlock count: " + unlockCount);
-            println("1: " + selX + " " + selY);
-            // println("2: " + xPoints[unlockCount] + " " + yPoints[unlockCount]);  
+        if (attemptCount >= 0 && attemptCount < 3) {
+            println("attempt count: " + attemptCount);
         }
 
         // push restart button
@@ -236,18 +237,20 @@ class Trackpad {
         else {
             int point = tokenPad[highlight.x][highlight.y];
 
-            if (unlockCount >= 2) {
-                println("System unlocked");  
-            }
-            else if (unlockCount != -1 && (selY * 7 + selX == point)) { 
-                unlockCount++;
-
-                highlight = randomPoint();
-            }
-            else {
-                unlockCount = -1;
+            // end of one authentication process
+            if (attemptCount >= unlockCount) {
+                if (successCount >= unlockCount)
+                    println("System unlocked");  
+                else
+                    println("Failed to unlock");
                 yRes = gridY;
-                println("Failed to unlock");
+            }
+            // continue the authentication process
+            else { 
+                if (selY * 7 + selX == point)
+                    successCount++;
+                attemptCount++;                
+                highlight = randomPoint();
             }
         }    
   }
@@ -295,7 +298,7 @@ class Trackpad {
 
         for(int y=0; y < yRes; y++) {
             for(int x=0; x < xRes; x++) {
-                if (unlockCount >= 2) {
+                if (successCount >= unlockCount) {
                     drawRestart();
 
                     // success
@@ -303,7 +306,7 @@ class Trackpad {
                     strokeWeight(3);
                     stroke(100,200,100,220);
                 }
-                else if (unlockCount <= -1) {
+                else if (attemptCount >= unlockCount) {
                     drawRestart();
 
                     // fail
