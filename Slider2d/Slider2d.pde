@@ -246,8 +246,11 @@ class Trackpad {
                 yRes = gridY;
             }
             // continue the authentication process
-            else { 
-                if (selY * 7 + selX == point)
+            else {
+                int selected = selY * 7 + selX;
+                println("expected: " + point + ", selected: " + selected); 
+                
+                if (selected == point)
                     successCount++;
                 attemptCount++;                
                 highlight = randomPoint();
